@@ -90,5 +90,9 @@ namespace log4net.loggly
         /// How many times library tries to send logs to Loggly before giving up and trying next batch.
         /// </summary>
         public int MaxSendRetries { get; set; }
+        /// <summary>
+        /// Override with raw formatter
+        /// </summary>
+        public bool UseRawFormatter { get; set; }
     }
 }

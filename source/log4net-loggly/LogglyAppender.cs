@@ -27,7 +27,7 @@ namespace log4net.loggly
         public override void ActivateOptions()
         {
             base.ActivateOptions();
-            _formatter = _formatter ?? new LogglyFormatter(_config);
+            _formatter = _formatter ?? (_config.UseRawFormatter ? (ILogglyFormatter)new RawLogglyFormatter(_config) : new LogglyFormatter(_config));
             _client = new LogglyClient(_config);
             _buffer = _buffer ?? new LogglyAsyncBuffer(_config, _client);
         }
@@ -42,6 +42,10 @@ namespace log4net.loggly
                 ? RenderLoggingEvent(loggingEvent)
                 : loggingEvent.RenderedMessage;
 
+            if (_config.UseRawFormatter) {
+                renderedMessage = ThreadContext.Properties["LogglyPayload"].ToString();
+            }
+            
             var formattedLog = _formatter.ToJson(loggingEvent, renderedMessage);
             if (formattedLog != null)
             {
@@ -128,6 +132,11 @@ namespace log4net.loggly
         {
             get => _config.NumberOfInnerExceptions;
             set => _config.NumberOfInnerExceptions = value;
+        }
+
+        public bool UseRawFormatter {
+            get => _config.UseRawFormatter;
+            set => _config.UseRawFormatter = value;
         }
         #endregion
     }
